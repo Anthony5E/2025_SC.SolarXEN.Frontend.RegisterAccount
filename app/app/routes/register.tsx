@@ -3,6 +3,8 @@ import { Input, FormControl, FormLabel, Paper, InputLabel, Button, Typography, G
 import Visibility from "@mui/icons-material/Visibility"
 import VisibilityOff from "@mui/icons-material/VisibilityOff"
 
+import logo from "../assets/solarxen_logo.png"
+
 const handleLoaded = () => { 
     window.grecaptcha?.ready(() => { 
         window.grecaptcha?.execute('6LcEzOYlAAAAAISlVX0h6tH2aRZsJGvHJy6hH8Mf', {action: "homepage"}).then((token: string) => {
@@ -72,7 +74,7 @@ const FormedPasswordInput = (props:any) => {
                         </IconButton>
                     </InputAdornment>
                 }
-                label="Password"
+                label={labelText}
             />
         </FormControl>
     )
@@ -115,18 +117,21 @@ export default function register() {
 
     return ( 
         <>
-            <Paper component="form">
-                <Grid container>
+            <Grid size={12} bgcolor={"#21b7b5"}>
+                <img src={logo} style={{width:"11%", padding:"10px", marginLeft:"20px"}}></img>
+                {/* <Typography variant="h5">성창 태양광 발전 모니터링 시스템 - 계정 등록 화면</Typography> */}
+            </Grid>
+
+            <Paper component="form" method="post" sx={{ width:"50rem"}}>
+                
+                <Grid container p={2} gap={2}>
                     {/* <div className="g-recaptcha" data-sitekey="6Ldnzw0rAAAAABFE7GD2Jde0YmDqatxKc7z1xyYa" data-callback="onSubmit"></div>  */}
-                    
-                    <Grid size={12}>
-                        <Typography variant="h5">모니터링 시스템 계정 등록</Typography>
-                    </Grid>
-                    <Grid size={12}>
+                    <Grid size={12} display={"flex"} gap={2}>
                         <FormControl>
-                            <InputLabel>asdsa</InputLabel>
-                            <Input id="uid" aria-describedby="uid-text"></Input>
+                            <InputLabel>ID</InputLabel>
+                            <OutlinedInput id="uid" aria-describedby="uid-text"></OutlinedInput>
                         </FormControl>
+                        <Button variant="contained">중복 확인</Button>
                     </Grid>
                     <Grid size={12}>
                         <FormedPasswordInput id="pw" labelText="비밀번호"></FormedPasswordInput>
@@ -134,20 +139,37 @@ export default function register() {
                     <Grid size={12}>
                         <FormedPasswordInput id="pwc" labelText="비밀번호 확인"></FormedPasswordInput>
                     </Grid>
-                    <Grid size={12}>
+                    <Grid size={12} display={"flex"} gap={2}>
                         <FormControl>
                             <InputLabel>주소</InputLabel>
                             <OutlinedInput id="addr" type="text" name="address" readOnly></OutlinedInput>
                         </FormControl>
-                        <Button type="button" onClick={getPostCodeViaDaumAPI}>주소 검색</Button>
+                        <Button variant="contained" type="button" onClick={getPostCodeViaDaumAPI}>주소 검색</Button>
                     </Grid>
-                    <Input id="addr2" type="text" name="address2"></Input>
-                    <Input id="tel" type="tel" name="tel"></Input>
-                    <Button type="submit" className="g-recaptcha" data-sitekey="6Ldnzw0rAAAAABFE7GD2Jde0YmDqatxKc7z1xyYa" data-callback="SubmitHandler" data-action="submit">계정 등록</Button>
-                </Grid>
-            </Paper>
+                    <Grid size={12}>
+                        <FormControl>
+                            <InputLabel>상세주소</InputLabel>
+                            <OutlinedInput id="addr2" type="text" name="address2"></OutlinedInput>
+                        </FormControl>
+                    </Grid>
+                    <Grid size={12}>
+                        <FormControl>
+                            <InputLabel>모니터링 담당자</InputLabel>
+                            <OutlinedInput id="name" type="text" name="name"></OutlinedInput>
+                        </FormControl>
+                    </Grid>
+                    <Grid size={12}>
+                        <Typography>연락처</Typography>
+                        {/* <FormControl> */}
+                        <OutlinedInput id="tel" type="tel" name="tel" placeholder="010-0000-0000" ></OutlinedInput>
+                        {/* </FormControl> */}
+                    </Grid>
 
-        
+                    <Grid size={6}>
+                        <Button variant="contained" fullWidth type="submit" className="g-recaptcha" data-sitekey="6Ldnzw0rAAAAABFE7GD2Jde0YmDqatxKc7z1xyYa" data-callback="SubmitHandler" data-action="submit">계정 등록</Button>
+                    </Grid>
+                </Grid>
+            </Paper>       
         </>
     )   
 }
