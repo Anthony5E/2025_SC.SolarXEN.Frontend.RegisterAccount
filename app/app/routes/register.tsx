@@ -1,5 +1,5 @@
 import React, { useEffect, type FormEventHandler } from "react"
-import { Input, FormControl, FormLabel, Paper, InputLabel, Button, Typography, Grid, OutlinedInput, InputAdornment, IconButton, FormHelperText } from "@mui/material"
+import { Input, FormControl, FormLabel, Paper, InputLabel, Button, Typography, Grid, OutlinedInput, InputAdornment, IconButton, FormHelperText, TextField } from "@mui/material"
 import Visibility from "@mui/icons-material/Visibility"
 import VisibilityOff from "@mui/icons-material/VisibilityOff"
 
@@ -55,9 +55,11 @@ const getPostCodeViaDaumAPI = () => {
 
 const FormedPasswordInput = (props:any) => {
 
-    const {id,labelText, handleChange, isPwEqual} = props
+    const {id,labelText, handleChange, handleBlur, errPW} = props
 
     const [showPassword, setShowPassword] = React.useState<boolean>(false)
+
+    const errLabel = id == "pw" ? "비밀번호를 4~20자 사이로 입력해 주세요." : "입력한 비밀번호가 다릅니다."
 
     const handleClickShowPassword = () => setShowPassword((show) => !show)
     const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -79,7 +81,7 @@ const FormedPasswordInput = (props:any) => {
                 id={id}
                 type={showPassword ? "text" : "password"}
 
-                error={!isPwEqual}
+                error={errPW}
                 endAdornment={
                     <InputAdornment position="end">
                         <IconButton 
@@ -102,16 +104,13 @@ const FormedPasswordInput = (props:any) => {
                 }}
 
                 onBlur={() => {
-                    console.log("blur event")
+                    handleBlur()
                 }}
             />
-            {/* <FormHelperText error>입력한 비밀번호가 다릅니다</FormHelperText> */}
-            <FormHelperText error hidden={isPwEqual}>비밀번호를 4~20자 사이로 입력해 주세요</FormHelperText>
+            <FormHelperText error hidden={!errPW}>{errLabel}</FormHelperText>
         </FormControl>
     )
 }
-
-
 
 // export const SubmitHandler = (token: string) => {
 //     console.log(token)
@@ -131,6 +130,17 @@ export default function register() {
     const [addr2, setAddr2] = React.useState<string>("")
     const [name, setName] = React.useState<string>("")
     const [tel, setTel] = React.useState<string>("")
+
+    const [errPwlen, setErrPwlen] = React.useState<boolean>(false)
+    const [errPwequal, setErrPwequal] = React.useState<boolean>(false)
+
+    const checkPWLength = () : boolean => {    
+        return pw.length >= 4 && pw.length <= 20 
+    }
+
+    const checkPWEqual = () : boolean => {
+        return pw === pwc
+    }
 
     const handlePw = (s : string) => {
         console.log(s)
@@ -177,7 +187,7 @@ export default function register() {
     return ( 
         <>
             <Grid size={12} bgcolor={"#21b7b5"}>
-                <img src={logo} style={{width:"11%", padding:"10px", marginLeft:"20px"}}></img>
+                <img src={logo} style={{width:"11%", padding:"10px", marginLeft:"20px"}} alt="logo"></img>
                 {/* <Typography variant="h5">성창 태양광 발전 모니터링 시스템 - 계정 등록 화면</Typography> */}
             </Grid>
 
@@ -194,17 +204,20 @@ export default function register() {
                         <Button variant="contained">중복 확인</Button>
                     </Grid>
                     <Grid size={12}>
-                        <FormedPasswordInput id="pw" name="pw" labelText="비밀번호" handleChange={handlePw}>{pw}</FormedPasswordInput>
+                        <FormedPasswordInput id="pw" name="pw" labelText="비밀번호" errPW={errPwlen} handleBlur={checkPWLength} handleChange={handlePw}>{pw}</FormedPasswordInput>
                     </Grid>
                     <Grid size={12}>
-                        <FormedPasswordInput id="pwc" labelText="비밀번호 확인" handleChange={handlePwc} handleEq={handleEqual()}>{pwc}</FormedPasswordInput>
+                        <FormedPasswordInput id="pwc" labelText="비밀번호 확인" errPw={errPwequal} handleChange={handlePwc} handleBlue={checkPWEqual}>{pwc}</FormedPasswordInput>
                     </Grid>
                     <Grid size={12} display={"flex"} gap={2}>
                         <Grid size={10}>
-                            <FormControl fullWidth>
+                            <TextField label="주소">
+                                
+                            </TextField>
+                            {/* <FormControl fullWidth>
                                 <InputLabel>주소</InputLabel>
-                                <OutlinedInput id="addr" type="text" name="address" label="주소" readOnly ></OutlinedInput>
-                            </FormControl>
+                                <OutlinedInput id="addr" type="text" name="address" label="주소" readOnly slotProps={{inputLabel: { shrink: true }}}></OutlinedInput>
+                            </FormControl> */}
                         </Grid>
                         <Button variant="contained" type="button" onClick={getPostCodeViaDaumAPI}>주소 검색</Button>
                     </Grid>
@@ -221,10 +234,10 @@ export default function register() {
                         </FormControl>
                     </Grid>
                     <Grid size={12}>
-                        <Typography>연락처</Typography>
-                        {/* <FormControl> */}
-                        <OutlinedInput id="tel" type="tel" name="tel" placeholder="010-0000-0000" ></OutlinedInput>
-                        {/* </FormControl> */}
+                        <FormControl>
+                            <InputLabel>연락처</InputLabel>
+                            <OutlinedInput id="tel" type="tel" name="tel" placeholder="010-0000-0000" ></OutlinedInput>
+                        </FormControl>
                     </Grid>
 
                     <Grid size={6} alignContent={"center"}>
