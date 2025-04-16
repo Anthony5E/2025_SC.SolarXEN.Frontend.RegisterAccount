@@ -25,8 +25,17 @@ const callPostAPI = (e: any) => {
     // })
 }
 
-const callCheckIDAPI = () => { 
+const callCheckIDAPI = (id : string) => { 
     console.log()
+
+    fetch("http://localhost:8080/api/chkid",{
+        method : "GET",
+        headers: { 
+            "id" : id
+        }
+    }).then(e => e.json()).then((e) => {
+        console.log(e.data.status) 
+    })
 }
 
 const loadExternalJs = (src: string, initFn : (script : HTMLScriptElement )=> void ) => {
@@ -199,9 +208,9 @@ export default function register() {
                     <Grid size={12} display={"flex"} gap={2}>
                         <FormControl>
                             <InputLabel>ID</InputLabel>
-                            <OutlinedInput id="id" name="id" aria-describedby="uid-text" label="ID">{id}</OutlinedInput>
+                            <OutlinedInput id="id" name="id" aria-describedby="uid-text" label="ID" onChange={(e)=> setId(e.target.value)}></OutlinedInput>
                         </FormControl>
-                        <Button variant="contained">중복 확인</Button>
+                        <Button variant="contained" onClick={() => {callCheckIDAPI(id)}}>중복 확인</Button>
                     </Grid>
                     <Grid size={12}>
                         <FormedPasswordInput id="pw" name="pw" labelText="비밀번호" errPW={errPwlen} handleBlur={checkPWLength} handleChange={handlePw}>{pw}</FormedPasswordInput>
