@@ -3,8 +3,6 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff"
 import { Button, FormControl, FormHelperText, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Paper, TextField } from "@mui/material"
 import React, { useEffect } from "react"
 
-import { KJUR, X509,KEYUTIL } from "jsrsasign"
-
 import logo from "../assets/solarxen_logo.png"
 
 const handleLoaded = () => { 
@@ -18,22 +16,60 @@ const handleLoaded = () => {
     // })
 }
 
+const pemToArrayBuffer = (pem: string): ArrayBuffer => {
+    const b64 = pem
+      .replace("-----BEGIN PUBLIC KEY-----\n", "")
+      .replace("\n-----END PUBLIC KEY-----", "")
+      .replace("/\s+/g", "");
+  
+    const binary = atob(b64);
+    const len = binary.length;
+    const buffer = new ArrayBuffer(len);
+    const view = new Uint8Array(buffer);
+  
+    for (let i = 0; i < len; i++) {
+      view[i] = binary.charCodeAt(i);
+    }
+  
+    return buffer;
+  }
+
+const a = async (pubPem:string) : Promise<CryptoKey> => {
+    const pub = pemToArrayBuffer(pubPem)
+
+    return await window.crypto.subtle.importKey("spki", pub, { name:"RSA-OAEP", hash:"SHA-256"}, true, ["encrypt"] )
+} 
+
+const aa = async (pubPem: string) : Promise<string> => {
+    const pubkey = await a(pubPem)
+
+    const encrypted = await window.crypto.subtle.encrypt({name:"RSA-OAEP"}, pubkey, new TextEncoder().encode("1234"))
+
+    return btoa(String.fromCharCode(...new Uint8Array(encrypted)))
+}
+
 const callGetHandshake = () => {
     fetch("http://localhost:8080/api/handshake", {
         method:"GET"
-    }).then((e) => e.json()).then((e) => {
+    }).then((e) => e.json()).then(async (e) => {
         console.log(e.data)
 
+        const dd = await aa(e.data)
+        console.log(dd)
 
+        callPostHandshake(dd)
         
+        // const pubKey = KEYUTIL.getKey(e.data)
+        // const enc = KJUR.crypto.Cipher.encrypt("1234",pubKey,"RSA")
+        // console.log(enc)
+
+        // const encryptedHex = pubKey.encrypt("1234")
+        // const encryptedB64 = Buffer.from(encryptedHex,'hex').toString('base64')
+
+        // console.log(encryptedB64)
 
 
-        const pubKey = KEYUTIL.getKey(e.data)
 
-        const encryptedHex = pubKey.encrypt("1234")
-        const encryptedB64 = Buffer.from(encryptedHex,'hex').toString('base64')
-
-        console.log(encryptedB64)
         // const pubKey = X509.getPublicKeyFromCertHex(e.data)
 
         // const x509 = new X509()
@@ -45,7 +81,6 @@ const callGetHandshake = () => {
         // const encryptedHex = pubKey.encrypt("1234")
         // const encryptedB64 = Buffer.from(encryptedHex,'hex').toString('base64')
 
-        console.log(pubKey)
 
         // const c = new KJUR.crypto.Cipher.encrypt("1234",e.data,"RSA")
         // c.init("-----BEGIN CERTIFICATE-----\n"+ e.data + "\n-----END CERTIFICATE-----")
@@ -53,6 +88,13 @@ const callGetHandshake = () => {
 
         // console.log(typeof(c))
     }) 
+}
+
+const callPostHandshake = (enc :string) => {
+    fetch("http://localhost:8080/api/handshake", {
+        method:"POST",
+        body: JSON.stringify({x:enc})
+    })
 }
 
 const callPostAPI = (e: any) => {
